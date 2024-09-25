@@ -24,7 +24,7 @@ public class Main {
         }
     }
 
-    // Affiche la somme des dés
+    // Calcule la somme des dés
     private static int sommeDes(Des[] resultats) {
         int somme = 0;
         for (Des resultat : resultats) {
@@ -38,32 +38,42 @@ public class Main {
         Des[] resultats = lancerDes();
         Scanner scanner = new Scanner(System.in);
 
+        int pointsAuTotal = 0;
+
         for (int index = 0; index < NBRE_LANCERS_AUTORISE; index++) {
             resultatDes(resultats);
 
             int sommeDes = sommeDes(resultats);
+            pointsAuTotal += sommeDes; // Ajout de la somme actuelle aux points totaux
+
             System.out.println("La somme des dés est : " + sommeDes);
+            System.out.println("Total cumulé des points : " + pointsAuTotal);
 
-            System.out.print("Voulez-vous relancer des dés ? (oui/non) : ");
-            String confirmation = scanner.nextLine();
+            // Ne pas demander de relancer des dés après le dernier lancer
+            if (index < NBRE_LANCERS_AUTORISE - 1) {
+                System.out.print("Voulez-vous relancer des dés ? (oui/non) : ");
+                String confirmation = scanner.nextLine();
 
-            if (confirmation.equalsIgnoreCase("oui")) {
-                System.out.print("Quel dés voulez vous relancer ? (numéro entre 1 et 5 séparé d'un espace)");
-                String choix = scanner.nextLine();
-                String[] choixDes = choix.split(" ");
+                if (confirmation.equalsIgnoreCase("oui")) {
+                    System.out.print("Quel(s) dé(s) voulez-vous relancer ? (numéro entre 1 et 5 séparé(s) d'un espace) : ");
+                    String choix = scanner.nextLine();
+                    String[] choixDes = choix.split(" ");
 
-                for (String choixDe : choixDes) {
-                    int choixNombre = Integer.parseInt(choixDe);
+                    for (String choixDe : choixDes) {
+                        int choixNombre = Integer.parseInt(choixDe);
 
-                    if (choixNombre >= 1 && choixNombre <= NBRE_DE) {
-                        resultats[choixNombre - 1].Lance();
-                    } else {
-                        System.out.println("Numéro de dé invalide : " + choixNombre);
-                        break;
+                        if (choixNombre >= 1 && choixNombre <= NBRE_DE) {
+                            resultats[choixNombre - 1].Lance();
+                        } else {
+                            System.out.println("Numéro de dé invalide : " + choixNombre);
+                        }
                     }
+                } else {
+                    break;
                 }
-
             }
         }
+
+        System.out.println("Le jeu est terminé. Votre score total est de : " + pointsAuTotal);
     }
 }
