@@ -33,6 +33,94 @@ public class Main {
         return somme;
     }
 
+    // Calcule les points en fonction de la combinaison détectée
+    private static int calculerPoints(Des[] resultats, String combinaison) {
+        switch (combinaison) {
+            case "Yahtzee":
+                return 50;
+            case "Carré":
+                return sommeDes(resultats);
+            case "Brelan":
+                return sommeDes(resultats);
+            case "Full House":
+                return 25;
+            case "Petite Suite":
+                return 30;
+            case "Grande Suite":
+                return 40;
+            case "Paire":
+                return sommeDes(resultats);
+            default:
+                return 0;
+        }
+    }
+
+    // Détecte la combinaison des dés
+    private static String detecterCombinaison(Des[] resultats) {
+        int[] MemeFace = new int[6];
+
+        // Compter le nombre de fois que chaque face apparaît
+        for (Des resultat : resultats) {
+            int face = resultat.getFace();
+            MemeFace[face - 1]++;
+        }
+
+        // Variables pour identifier les combinaisons
+        boolean brelan = false;
+        boolean carre = false;
+        boolean yahtzee = false;
+        int paires = 0;
+
+        // Analyse des meme faces
+        for (int occurrence : MemeFace) {
+            if (occurrence == 5) {
+                yahtzee = true;
+            } else if (occurrence == 4) {
+                carre = true;
+            } else if (occurrence == 3) {
+                brelan = true;
+            } else if (occurrence == 2) {
+                paires++;
+            }
+        }
+
+        // Détecter les suites
+        boolean petiteSuite = (MemeFace[0] >= 1 && MemeFace[1] >= 1 && MemeFace[2] >= 1 && MemeFace[3] >= 1) ||
+                (MemeFace[1] >= 1 && MemeFace[2] >= 1 && MemeFace[3] >= 1 && MemeFace[4] >= 1) ||
+                (MemeFace[2] >= 1 && MemeFace[3] >= 1 && MemeFace[4] >= 1 && MemeFace[5] >= 1);
+
+        boolean grandeSuite = (MemeFace[0] == 1 && MemeFace[1] == 1 && MemeFace[2] == 1 && MemeFace[3] == 1 && MemeFace[4] == 1) ||
+                (MemeFace[1] == 1 && MemeFace[2] == 1 && MemeFace[3] == 1 && MemeFace[4] == 1 && MemeFace[5] == 1);
+
+        // Retourne la combinaison détectée
+        if (yahtzee) {
+            return "Yahtzee";
+        }
+        if (carre) {
+            return "Carré";
+        }
+        if (brelan && paires == 1) {
+            return "Full House";
+        }
+        if (brelan) {
+            return "Brelan";
+        }
+        if (grandeSuite) {
+            return "Grande Suite";
+        }
+        if (petiteSuite) {
+            return "Petite Suite";
+        }
+        if (paires == 2) {
+            return "Double Paire";
+        }
+        if (paires == 1) {
+            return "Paire";
+        }
+
+        return "Aucune combinaison";
+    }
+
     public static void main(String[] args) {
 
         Des[] resultats = lancerDes();
@@ -43,10 +131,16 @@ public class Main {
         for (int index = 0; index < NBRE_LANCERS_AUTORISE; index++) {
             resultatDes(resultats);
 
-            int sommeDes = sommeDes(resultats);
-            pointsAuTotal += sommeDes; // Ajout de la somme actuelle aux points totaux
+            // Détecte et affiche la combinaison réalisée
+            String combinaison = detecterCombinaison(resultats);
+            System.out.println("Combinaison réalisée : " + combinaison);
 
-            System.out.println("La somme des dés est : " + sommeDes);
+            // Calcul des points en fonction de la combinaison
+            int points = calculerPoints(resultats, combinaison);
+            pointsAuTotal += points;
+
+            // Afficher les points reçus et le total
+            System.out.println("Vous avez reçu " + points + " points pour cette combinaison.");
             System.out.println("Total cumulé des points : " + pointsAuTotal);
 
             // Ne pas demander de relancer des dés après le dernier lancer
